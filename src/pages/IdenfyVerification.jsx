@@ -38,11 +38,12 @@ const IdenfyVerification = () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to generate token");
+      const data = await response.json();
+
+      if (!response.ok || !data?.authToken) {
+        throw new Error(data?.message || "Failed to generate token");
       }
 
-      const data = await response.json();
       if (data?.authToken) {
         setAuthToken(data?.authToken);
         setShowIframe(true);
@@ -51,6 +52,7 @@ const IdenfyVerification = () => {
         setShowIframe(false);
       }
     } catch (err) {
+      console.log("🚀 ~ generateToken ~ err:", err);
       setError(err.message);
       console.error("Error generating token:", err);
     } finally {
@@ -60,7 +62,7 @@ const IdenfyVerification = () => {
 
   // Listen for messages from the iframe
   useEffect(() => {
-    const handleMessage = (event) => {
+    const handleMessage = async (event) => {
       // For security, verify the origin
       if (event.origin !== "https://ui.idenfy.com") {
         return;
@@ -76,6 +78,7 @@ const IdenfyVerification = () => {
         if (status === "APPROVED") {
           setVerificationStatus("success");
           setShowIframe(false);
+          await markUserKycVerified(userId);
         } else if (status === "DENIED") {
           setVerificationStatus("failed");
           setShowIframe(false);
@@ -131,6 +134,25 @@ const IdenfyVerification = () => {
   useEffect(() => {
     generateToken();
   }, []);
+
+  async function markUserKycVerified(userId) {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/idenfy/${userId}/kyc-verified`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ verified: true }),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to update KYC status");
+      const data = await res.json();
+      console.log("User updated:", data);
+    } catch (err) {
+      console.error("Error updating KYC:", err);
+    }
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-4xl mx-auto">
