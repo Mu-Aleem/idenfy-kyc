@@ -7,7 +7,7 @@ function App() {
     <div className="w-full">
       <BrowserRouter>
         <Routes>
-          <Route path="/:userId" element={<IdenfyVerification />} />
+          <Route path="/" element={<IdenfyVerification />} />
         </Routes>
       </BrowserRouter>
     </div>

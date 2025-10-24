@@ -9,7 +9,7 @@ import {
 import { useParams } from "react-router-dom";
 
 const IdenfyVerification = () => {
-  const { userId } = useParams();
+  const userId = "asdasdasdasasasss";
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const [authToken, setAuthToken] = useState(null);
