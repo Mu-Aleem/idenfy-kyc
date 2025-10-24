@@ -6,10 +6,12 @@ import {
   AlertCircle,
   Loader,
 } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 const IdenfyVerification = () => {
-  const userId = "asdasdasdasasasss";
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const userId = queryParams.get("USER_ID");
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const [authToken, setAuthToken] = useState(null);
